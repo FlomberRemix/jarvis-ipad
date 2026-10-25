@@ -32,7 +32,7 @@ struct ContentView: View {
                         }
                         .padding()
                     }
-                    .onChange(of: messages.count) { _, _ in
+                    .onChange(of: messages.count) { _ in
                         if let last = messages.last { withAnimation { proxy.scrollTo(last.id, anchor: .bottom) } }
                     }
                 }
@@ -43,7 +43,7 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $showSettings) { settingsSheet }
-        .onChange(of: speech.recognizedText) { _, newValue in
+        .onChange(of: speech.recognizedText) { newValue in
             if !newValue.isEmpty { input = newValue }
         }
     }
