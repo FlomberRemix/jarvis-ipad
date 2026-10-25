@@ -27,7 +27,9 @@ final class SpeechManager: ObservableObject {
                 return
             }
             let granted = await withCheckedContinuation { continuation in
-                AVAudioApplication.requestRecordPermission { continuation.resume(returning: $0) }
+                AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                    continuation.resume(returning: granted)
+                }
             }
             guard granted else {
                 status = "Немає дозволу на мікрофон."
