@@ -1,0 +1,29 @@
+name: Native iPadOS build
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "native/JARVISiPad/**"
+      - ".github/workflows/ios-build.yml"
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: native/JARVISiPad
+        run: xcodegen generate
+
+      - name: Build for iPad Simulator
+        working-directory: native/JARVISiPad
+        run: xcodebuild -project JARVISiPad.xcodeproj -scheme JARVISiPad -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
