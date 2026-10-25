@@ -16,7 +16,11 @@ final class SpeechManager: ObservableObject {
     func startListening() {
         guard !isListening else { return }
         Task {
-            let speechStatus = await SFSpeechRecognizer.requestAuthorization()
+            let speechStatus: SFSpeechRecognizerAuthorizationStatus = await withCheckedContinuation { continuation in
+                SFSpeechRecognizer.requestAuthorization { status in
+                    continuation.resume(returning: status)
+                }
+            }
             guard speechStatus == .authorized else {
                 status = "Дозволь розпізнавання мовлення в Налаштуваннях iPad."
                 return
