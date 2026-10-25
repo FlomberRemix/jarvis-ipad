@@ -24,6 +24,31 @@ jobs:
         working-directory: native/JARVISiPad
         run: xcodegen generate
 
-      - name: Build for iPad Simulator
+      - name: Build for physical iPad (unsigned)
         working-directory: native/JARVISiPad
-        run: xcodebuild -project JARVISiPad.xcodeproj -scheme JARVISiPad -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
+        run: |
+          xcodebuild \
+            -project JARVISiPad.xcodeproj \
+            -scheme JARVISiPad \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package unsigned IPA
+        working-directory: native/JARVISiPad
+        run: |
+          mkdir -p package/Payload
+          cp -R build/Build/Products/Release-iphoneos/JARVIS.app package/Payload/
+          cd package
+          /usr/bin/zip -qry ../JARVIS-unsigned.ipa Payload
+
+      - name: Upload install package
+        uses: actions/upload-artifact@v4
+        with:
+          name: JARVIS-unsigned-IPA
+          path: native/JARVISiPad/JARVIS-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 7
